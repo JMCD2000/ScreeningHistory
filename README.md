@@ -1,7 +1,7 @@
 # ScreeningHistory
 This is a VBA project that opens weekly excel reports and then updates the Access Database and or a remote database found under the Screencatcher_Analyst project. This automates the populating of the weekly data to build combined tables and metrics in Access with VBA
 
-I would have loved to have done this project in Python, but my work doesn't allow it. This runs using VBA, but the uploaded code is listed as VB to support some sort of code highlighting. The more tables there are the slower this runs. This is just an issue with using VBA and 32bit office. Again, it is what my work allows and has configured.
+I would have loved to have done this project in Python, but my work doesn't allow it. This runs using VBA written in Modules in MS Access 2016. The more tables there are the slower this runs. This is just an issue with using VBA and 32bit office. Again, it is what my work allows and has configured.
 
 I run weekly exports from a database that exports to excel to provide a status of open items, a burn rate, a class comparision, and responsibity for action. These weekly reports are used to build the data tables. This ScreeningHistory code was developed in 2015 to automate the aggration of screening data. It has a slow run time and the project met the goals but was not activly used until the Screencatcher_Analyst was written in Feburary 2020 to find the curn of rescreenings, changes in responsibility from Government to Contractor, Number of screenings and combinations, and other metrics. The manual cleaning and loading of Excel reports into Access was time consuming and could introduce errors. So this project was dusted of and modified to be able to use the Screencatcher_Analyst database.
 
