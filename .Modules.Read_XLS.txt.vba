@@ -261,34 +261,56 @@ Public Function OpenXls_BeanReport(ByVal strPath As String, ByVal strPath_Databa
         mySTATUS = myCol_H 'Col H STATUS
         myActTkn = myCol_I 'Col I ACTION TAKEN
         
-'~~This can produce an error, will need to check for date data
-        'May need to do a check on the date format to see
+        'Need to do a check on the date format to see
         'if it is yyyy-mm-dd or mm/dd/yyyy
-        If fileReport = "TSM_EXPORT" Then
-            myMM_Disc = Mid(myCol_J, 6, 2) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
-            myDD_Disc = Mid(myCol_J, 9, 2) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
-            myYYYY_Disc = Mid(myCol_J, 1, 4) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
-            myDateDisc = myMM_Disc & "/" & myDD_Disc & "/" & myYYYY_Disc 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
-            
-            If Len(myCol_K) = 10 Then
-                myMM_Close = Mid(myCol_K, 6, 2) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
-                myDD_Close = Mid(myCol_K, 9, 2) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
-                myYYYY_Close = Mid(myCol_K, 1, 4) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
-                myDateClose = myMM_Close & "/" & myDD_Close & "/" & myYYYY_Close 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+        If (InStr(1, myCol_J, "/", 1)) = 0 Then
+            If fileReport = "TSM_EXPORT" Then
+                myMM_Disc = Mid(myCol_J, 6, 2) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                myDD_Disc = Mid(myCol_J, 9, 2) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                myYYYY_Disc = Mid(myCol_J, 1, 4) 'yyyy-mm-dd Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                myDateDisc = myMM_Disc & "/" & myDD_Disc & "/" & myYYYY_Disc 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
                 
-            Else
-                myDateClose = Empty
-                
+                If Len(myCol_K) = 10 Then
+                    myMM_Close = Mid(myCol_K, 6, 2) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                    myDD_Close = Mid(myCol_K, 9, 2) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                    myYYYY_Close = Mid(myCol_K, 1, 4) 'yyyy-mm-dd Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                    myDateClose = myMM_Close & "/" & myDD_Close & "/" & myYYYY_Close 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                    
+                Else
+                    myDateClose = Empty
+                    
+                End If
+            'May need to do a check on the date format to see
+            'if it is yyyy-mm-dd or mm/dd/yyyy
+            ElseIf fileReport = "Bean_Data" Then
+                myDateDisc = myCol_J 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                If Len(myCol_K) = 10 Then
+                    myDateClose = myCol_K 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                Else
+                    myDateClose = Empty
+                End If
             End If
-        'May need to do a check on the date format to see
-        'if it is yyyy-mm-dd or mm/dd/yyyy
-        ElseIf fileReport = "Bean_Data" Then
-            myDateDisc = myCol_J 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
-            If Len(myCol_K) = 10 Then
-                myDateClose = myCol_K 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
-            Else
-                myDateClose = Empty
+        ElseIf (InStr(1, myCol_J, "-", 1)) = 0 Then
+            If fileReport = "TSM_EXPORT" Then
+                myDateDisc = myCol_J 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                If Len(myCol_K) = 10 Then
+                    myDateClose = myCol_K 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                Else
+                    myDateClose = Empty
+                End If
+            ElseIf fileReport = "Bean_Data" Then
+                myDateDisc = myCol_J 'Col J DATE DISCOVERED' = Format(Now, "mm/dd/yyyy")
+                If Len(myCol_K) = 10 Then
+                    myDateClose = myCol_K 'Col K DATE CLOSED' = Format(Now, "mm/dd/yyyy")
+                Else
+                    myDateClose = Empty
+                End If
             End If
+        Else
+            Debug.Print ("Date read error. Col J DATE DISCOVERED: " & myCol_J)
+            'Untrapped Date read error
+            myDateDisc = #2/2/1902#
+            myDateClose = #2/2/1902#
         End If
         
         myTrial_ID = myCol_L 'Col L TRIAL ID
