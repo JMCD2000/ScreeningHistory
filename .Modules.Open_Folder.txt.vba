@@ -26,10 +26,14 @@ Public Function openFolder(curClassHull As String, dbTarget As String)
     strPath = Application.FileDialog(4).SelectedItems(1) '4=msoFileDialogFolderPicker
     
     'Call to the Database application picker
-    If dbTarget = "f" Then
+    If dbTarget = "Screencatcher" Then
         Application.FileDialog(3).Title = "Select the database file path" '3=msoFileDialogFilePicker
         intResult_Database = Application.FileDialog(3).Show '3=msoFileDialogFilePicker
         strPath_Database = Application.FileDialog(3).SelectedItems(1) '3=msoFileDialogFolderPicker
+        Debug.Print "strPath_Database : " & strPath_Database
+    ElseIf dbTarget = "ScreeningHistory" Then
+        'Do nothing
+        strPath_Database = Empty
         Debug.Print "strPath_Database : " & strPath_Database
     Else
         'Do nothing
@@ -137,15 +141,19 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
     Dim objFile As Object 'Current object file in Current object folder
     ''''Dim vars used in loop
     Dim skipAction As Boolean 'Used for flagging that current file is not what I am looking for
-    Dim myfileNameVar1 As String '
-    Dim myfileNameVar2 As String '
-    Dim myfileNameVar3 As String '
-    Dim myfileNameVar4 As String '
-    Dim myfileNameVar5 As String '
-    Dim myfileNameVar6 As String '
-    Dim myfileNameVar7 As String '
-    Dim myfileNameVar8 As String '
-    Dim myfileNameVar9 As String '
+    Dim myfileNameVar1 As String ' (00)_LPD17Bean(DATA)MM.DD.YYYY.xlsx
+    Dim myfileNameVar2 As String ' (0)_LPD17Bean(DATA)MM.DD.YYYY.xlsx
+    Dim myfileNameVar3 As String ' LPD17Bean(DATA)(FCT)MM.DD.YYYY.xlsx
+    Dim myfileNameVar4 As String ' LPD17Bean(DATA)(INSURV)MM.DD.YYYY
+    Dim myfileNameVar5 As String ' LPD27Bean(FULL)(DATA)02.22.2019x
+    Dim myfileNameVar6 As String ' LPD24Bean(DATA)(ALL TC)12.14.2012p
+    Dim myfileNameVar7 As String ' LPD17Bean(DATA)MM.DD.YYYY.xlsx
+    Dim myfileNameVar8 As String ' YYYYMMDD_1 LPD nu ALL bean bu.xls
+    Dim myfileNameVar9 As String ' YYYYMMDD_1 LPD 17 ALL bean bu.xls
+    Dim myfileNameVar10 As String ' YYYYMMDD LPD nu ALL bean bu.xls
+    Dim myfileNameVar11 As String ' YYYYMMDD LPD 17 ALL bean bu.xls
+    Dim myfileNameVar12 As String ' YYYYMMDD LPD 26 INSURV Bean Burn.xls
+    Dim myfileNameVar13 As String ' YYYYMMDD LPD 22 Bean Burn.xls
     Dim reportDate As Date ' Month/Day/Year
     Dim ScrCtchr_reportDate As String ' Year/Month/Day
     Dim myMM As String '
@@ -154,7 +162,7 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
     
    
     For Each objFile In objFolder.Files
-        
+        Debug.Print ("Current objFile File: " & objFile)
         'This is used to check if the target file is a Text file or Excel file
         ' It is hardcoded in the myfileNameVar
         'fileExt = objFile.GetExtensionName(objFile)
@@ -165,23 +173,24 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
         skipAction = False
         
         'This is where the Beans have been ordered
-        
-        myfileNameVar1 = "(??)_LPD" & hullNum & "Bean(DATA)*" 'two digit serial order
-        myfileNameVar2 = "(?)_LPD" & hullNum & "Bean(DATA)*" 'one digit serial order
+        myfileNameVar1 = "(??)_LPD" & hullNum & "Bean(DATA)*" 'two digit serial order (00)_LPD17Bean(DATA)MM.DD.YYYY.xlsx
+        myfileNameVar2 = "(?)_LPD" & hullNum & "Bean(DATA)*" 'one digit serial order (0)_LPD17Bean(DATA)MM.DD.YYYY.xlsx
         
         'This is for the beans that are un-ordered
-        
-        myfileNameVar3 = "LPD" & hullNum & "Bean(DATA)(FCT)*"
-        myfileNameVar4 = "LPD" & hullNum & "Bean(DATA)(INSURV)*"
-        myfileNameVar5 = "LPD" & hullNum & "Bean(DATA)*" 'Must be last for this name series
+        myfileNameVar3 = "LPD" & hullNum & "Bean(DATA)(FCT)*" ' LPD17Bean(DATA)(FCT)MM.DD.YYYY.xlsx
+        myfileNameVar4 = "LPD" & hullNum & "Bean(DATA)(INSURV)*" ' LPD17Bean(DATA)(INSURV)MM.DD.YYYY.xlsx
+        myfileNameVar5 = "LPD" & hullNum & "Bean(FULL)(DATA)*" ' LPD27Bean(FULL)(DATA)MM.DD.YYYYx.xlsx
+        myfileNameVar6 = "LPD" & hullNum & "Bean(DATA)(ALL TC)*" ' LPD24Bean(DATA)(ALL TC)MM.DD.YYYYp.xlsx
+        myfileNameVar7 = "LPD" & hullNum & "Bean(DATA)*" 'Must be last for this name series LPD17Bean(DATA)MM.DD.YYYY.xlsx
         
         'This is for the TSM export file
-        
-        myfileNameVar6 = "????????_? LPD nu *"
-        myfileNameVar7 = "????????_? LPD " & hullNum & " *"
-        myfileNameVar8 = "???????? LPD nu *"
-        myfileNameVar9 = "???????? LPD " & hullNum & " *"
-        
+        myfileNameVar8 = "????????_? LPD nu *" ' YYYYMMDD_1 LPD nu ALL bean bu.xls
+        myfileNameVar9 = "????????_? LPD " & hullNum & " *" ' YYYYMMDD_1 LPD 17 ALL bean bu.xls
+        myfileNameVar10 = "???????? LPD nu *" ' YYYYMMDD LPD nu ALL bean bu.xls
+        myfileNameVar11 = "???????? LPD " & hullNum & " ALL *" ' YYYYMMDD LPD 17 ALL bean bu.xls
+        myfileNameVar12 = "???????? LPD " & hullNum & " INSURV *" ' YYYYMMDD LPD 26 INSURV Bean Burn.xls
+        myfileNameVar13 = "???????? LPD " & hullNum & " *" ' YYYYMMDD LPD 22 Bean Burn.xls
+
         myCurFile = objFile.Name
         myCurPath = objFile.Path
 '        fileExt = objFile.GetExtensionName(objFile)
@@ -249,8 +258,38 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
             '~~Debug.Print "myfileNameVar4 : " & myfileNameVar4
             fileReport = "Bean_Data"
             
-        'The file name should be like LPD17Bean(DATA)MM.DD.YYYY.xlsx
+        'The file name should be like LPD27Bean(FULL)(DATA)MM.DD.YYYYx.xlsx
         ElseIf myCurFile Like myfileNameVar5 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 22, 2) 'LPD27Bean(FULL)(DATA)02.22.2019x.xlsx
+            myDD = Mid(objFile.Name, 25, 2) 'LPD27Bean(FULL)(DATA)02.22.2019x.xlsx
+            myYYYY = Mid(objFile.Name, 28, 4) 'LPD27Bean(FULL)(DATA)02.22.2019x.xlsx
+            myHullCk = Mid(objFile.Name, 4, 2) 'LPD27Bean(FULL)(DATA)02.22.2019x.xlsx
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var5: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar5 : " & myfileNameVar5
+            fileReport = "Bean_Data"
+            
+        'The file name should be like LPD24Bean(DATA)(ALL TC)MM.DD.YYYYp.xlsx
+        ElseIf myCurFile Like myfileNameVar6 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 24, 2) 'LPD24Bean(DATA)(ALL TC)12.14.2012p.xlsx
+            myDD = Mid(objFile.Name, 27, 2) 'LPD24Bean(DATA)(ALL TC)12.14.2012p.xlsx
+            myYYYY = Mid(objFile.Name, 30, 4) 'LPD24Bean(DATA)(ALL TC)12.14.2012p.xlsx
+            myHullCk = Mid(objFile.Name, 4, 2) 'LPD24Bean(DATA)(ALL TC)12.14.2012p.xlsx
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var6: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar6 : " & myfileNameVar6
+            fileReport = "Bean_Data"
+            
+        'The file name should be like LPD17Bean(DATA)MM.DD.YYYY.xlsx
+        ElseIf myCurFile Like myfileNameVar7 Then
             'extract date from report source name
             myMM = Mid(objFile.Name, 16, 2) 'LPD17Bean(DATA)01.15.2008.xlsx
             myDD = Mid(objFile.Name, 19, 2) 'LPD17Bean(DATA)01.15.2008.xlsx
@@ -259,50 +298,18 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
             reportDate = myMM & "/" & myDD & "/" & myYYYY
             ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
             openWith = "OpenXls_BeanReport"
-            Debug.Print "Var5: LPD " & hullNum & " reportDate : " & reportDate
-            '~~Debug.Print "myHullCk : " & myHullCk
-            '~~Debug.Print "myfileNameVar5 : " & myfileNameVar5
-            fileReport = "Bean_Data"
-        
-        'The file name should be like 20161114_1 LPD nu ALL bean bu.xls
-        ElseIf myCurFile Like myfileNameVar6 Then
-            'extract date from report source name
-            myMM = Mid(objFile.Name, 5, 2) '20161114_1 LPD nu ALL bean bu.xls
-            myDD = Mid(objFile.Name, 7, 2) '20161114_1 LPD nu ALL bean bu.xls
-            myYYYY = Mid(objFile.Name, 1, 4) '20161114_1 LPD nu ALL bean bu.xls
-            myHullCk = Mid(objFile.Name, 16, 2) '20161114_1 LPD nu ALL bean bu.xls
-            '~~Debug.Print "myHullCk : " & myHullCk
-            myHullCk = hullNum
-            reportDate = myMM & "/" & myDD & "/" & myYYYY
-            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
-            openWith = "OpenXls_BeanReport"
-            Debug.Print "Var6: LPD " & hullNum & " reportDate : " & reportDate
-            '~~Debug.Print "myHullCk : " & myHullCk
-            '~~Debug.Print "myfileNameVar6 : " & myfileNameVar6
-            fileReport = "TSM_EXPORT"
-        
-        'The file name should be like 20161114_1 LPD 17 ALL bean bu.xls
-        ElseIf myCurFile Like myfileNameVar7 Then
-            'extract date from report source name
-            myMM = Mid(objFile.Name, 5, 2) '20161114_1 LPD 17 ALL bean bu.xls
-            myDD = Mid(objFile.Name, 7, 2) '20161114_1 LPD 17 ALL bean bu.xls
-            myYYYY = Mid(objFile.Name, 1, 4) '20161114_1 LPD 17 ALL bean bu.xls
-            myHullCk = Mid(objFile.Name, 16, 2) '20161114_1 LPD 17 ALL bean bu.xls
-            reportDate = myMM & "/" & myDD & "/" & myYYYY
-            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
-            openWith = "OpenXls_BeanReport"
             Debug.Print "Var7: LPD " & hullNum & " reportDate : " & reportDate
             '~~Debug.Print "myHullCk : " & myHullCk
             '~~Debug.Print "myfileNameVar7 : " & myfileNameVar7
-            fileReport = "TSM_EXPORT"
+            fileReport = "Bean_Data"
         
-        'The file name should be like 20161114 LPD nu ALL bean bu.xls
+        'The file name should be like YYYYMMDD_1 LPD nu ALL bean bu.xls
         ElseIf myCurFile Like myfileNameVar8 Then
             'extract date from report source name
-            myMM = Mid(objFile.Name, 5, 2) '20161114 LPD nu ALL bean bu.xls
-            myDD = Mid(objFile.Name, 7, 2) '20161114 LPD nu ALL bean bu.xls
-            myYYYY = Mid(objFile.Name, 1, 4) '20161114 LPD nu ALL bean bu.xls
-            myHullCk = Mid(objFile.Name, 16, 2) '20161114 LPD nu ALL bean bu.xls
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD_1 LPD nu ALL bean bu.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD_1 LPD nu ALL bean bu.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD_1 LPD nu ALL bean bu.xls
+            myHullCk = Mid(objFile.Name, 16, 2) 'YYYYMMDD_1 LPD nu ALL bean bu.xls
             '~~Debug.Print "myHullCk : " & myHullCk
             myHullCk = hullNum
             reportDate = myMM & "/" & myDD & "/" & myYYYY
@@ -313,13 +320,13 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
             '~~Debug.Print "myfileNameVar8 : " & myfileNameVar8
             fileReport = "TSM_EXPORT"
         
-        'The file name should be like 20161114 LPD 17 ALL bean bu.xls
+        'The file name should be like YYYYMMDD_1 LPD 17 ALL bean bu.xls
         ElseIf myCurFile Like myfileNameVar9 Then
             'extract date from report source name
-            myMM = Mid(objFile.Name, 5, 2) '20161114 LPD 17 ALL bean bu.xls
-            myDD = Mid(objFile.Name, 7, 2) '20161114 LPD 17 ALL bean bu.xls
-            myYYYY = Mid(objFile.Name, 1, 4) '20161114 LPD 17 ALL bean bu.xls
-            myHullCk = Mid(objFile.Name, 16, 2) '20161114 LPD 17 ALL bean bu.xls
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD_1 LPD 17 ALL bean bu.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD_1 LPD 17 ALL bean bu.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD_1 LPD 17 ALL bean bu.xls
+            myHullCk = Mid(objFile.Name, 16, 2) 'YYYYMMDD_1 LPD 17 ALL bean bu.xls
             reportDate = myMM & "/" & myDD & "/" & myYYYY
             ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
             openWith = "OpenXls_BeanReport"
@@ -327,12 +334,74 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
             '~~Debug.Print "myHullCk : " & myHullCk
             '~~Debug.Print "myfileNameVar9 : " & myfileNameVar9
             fileReport = "TSM_EXPORT"
+        
+        'The file name should be like YYYYMMDD LPD nu ALL bean bu.xls
+        ElseIf myCurFile Like myfileNameVar10 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD LPD nu ALL bean bu.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD LPD nu ALL bean bu.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD LPD nu ALL bean bu.xls
+            myHullCk = Mid(objFile.Name, 14, 2) 'YYYYMMDD LPD nu ALL bean bu.xls
+            '~~Debug.Print "myHullCk : " & myHullCk
+            myHullCk = hullNum
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var10: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar10 : " & myfileNameVar10
+            fileReport = "TSM_EXPORT"
+        
+        'The file name should be like YYYYMMDD LPD 17 ALL bean bu.xls
+        ElseIf myCurFile Like myfileNameVar11 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD LPD 17 ALL bean bu.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD LPD 17 ALL bean bu.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD LPD 17 ALL bean bu.xls
+            myHullCk = Mid(objFile.Name, 14, 2) 'YYYYMMDD LPD 17 ALL bean bu.xls
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var11: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar11 : " & myfileNameVar11
+            fileReport = "TSM_EXPORT"
+            
+        'The file name should be like YYYYMMDD LPD 26 INSURV Bean Burn.xls
+        ElseIf myCurFile Like myfileNameVar12 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD LPD 26 INSURV Bean Burn.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD LPD 26 INSURV Bean Burn.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD LPD 26 INSURV Bean Burn.xls
+            myHullCk = Mid(objFile.Name, 14, 2) 'YYYYMMDD LPD 26 INSURV Bean Burn.xls
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var12: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar12 : " & myfileNameVar12
+            fileReport = "TSM_EXPORT"
+            
+        'The file name should be like YYYYMMDD LPD 22 Bean Burn.xls
+        ElseIf myCurFile Like myfileNameVar13 Then
+            'extract date from report source name
+            myMM = Mid(objFile.Name, 5, 2) 'YYYYMMDD LPD 22 Bean Burn.xls
+            myDD = Mid(objFile.Name, 7, 2) 'YYYYMMDD LPD 22 Bean Burn.xls
+            myYYYY = Mid(objFile.Name, 1, 4) 'YYYYMMDD LPD 22 Bean Burn.xls
+            myHullCk = Mid(objFile.Name, 14, 2) 'YYYYMMDD LPD 22 Bean Burn.xls
+            reportDate = myMM & "/" & myDD & "/" & myYYYY
+            ScrCtchr_reportDate = myYYYY & "/" & myMM & "/" & myDD
+            openWith = "OpenXls_BeanReport"
+            Debug.Print "Var13: LPD " & hullNum & " reportDate : " & reportDate
+            '~~Debug.Print "myHullCk : " & myHullCk
+            '~~Debug.Print "myfileNameVar13 : " & myfileNameVar13
+            fileReport = "TSM_EXPORT"
             
         Else:
             'File doesnt match my file name patern
             'will goto next because reportDate is empty
             skipAction = True
-            '~~Debug.Print "Hull " & hullNum & " file name NOT LIKE or NO MATCH with Vars"
+            Debug.Print "Hull " & hullNum & " file name NOT LIKE or NO MATCH with Vars"
             
         End If
         
@@ -341,9 +410,16 @@ Private Function GetAllFiles(ByVal strPath As String, ByVal strPath_Database As 
         myDD = Empty
         myYYYY = Empty
         
+        'Check if the Report Hull Number and the Table Hull number match
         If myHullCk <> hullNum Then
             skipAction = True
-            '~~Debug.Print "Report Hull number[ " & myHullCk & " ] and Current Action Hull number[ " & hullNum & " ] NOT EQUAL"
+            Debug.Print "Report Hull number[ " & myHullCk & " ] and Current Action Hull number[ " & hullNum & " ] NOT EQUAL"
+        ElseIf myHullCk = hullNum Then
+            skipAction = False
+            Debug.Print "Report Hull number[ " & myHullCk & " ] and Current Action Hull number[ " & hullNum & " ] Are EQUAL"
+        Else
+            'there is an error
+            Debug.Print "Value Error in Report Hull number[ " & myHullCk & " ] and Current Action Hull number[ " & hullNum & " ] !"
         End If
         
         'Check if current file has already been read in. CheckCurFile_meta returns a Boolean
